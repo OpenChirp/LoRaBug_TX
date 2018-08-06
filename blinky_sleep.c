@@ -114,7 +114,7 @@ int main(void)
     // Board_initUART();
     // Board_initWatchdog();
 
-    BoardInitMcu(); // Initialize LoRa Stack
+    BoardInitMcu(); // Initialize LoRa Stack - Must call initSPI before
 
     /* Construct heartBeat Task  thread */
     Task_Params_init(&taskParams);
@@ -128,8 +128,6 @@ int main(void)
     if(!ledPinHandle) {
         System_abort("Error initializing board LED pins\n");
     }
-
-    PIN_setOutputValue(ledPinHandle, Board_LED1, 1);
 
     /* Start BIOS */
     BIOS_start();
