@@ -31,7 +31,7 @@
  */
 
 /*
- *  ====================== CC2650_LAUNCHXL.c ===================================
+ *  ====================== LORABUG.c ===================================
  *  This file is responsible for setting up the board specific items for the
  *  CC2650 LaunchPad.
  */
@@ -73,18 +73,25 @@
 #endif
 
 const PIN_Config BoardGpioInitTable[] = {
+    Board_RLED        | PIN_GPIO_OUTPUT_EN  | PIN_GPIO_LOW | PIN_PUSHPULL | PIN_DRVSTR_MAX, /* LED initially off */
+    Board_GLED        | PIN_GPIO_OUTPUT_EN  | PIN_GPIO_LOW | PIN_PUSHPULL | PIN_DRVSTR_MAX, /* LED initially off */
+    Board_BTN         | PIN_INPUT_EN        | PIN_NOPULL, /* Button is active low */
+    Board_UART_RX     | PIN_INPUT_EN        | PIN_NOPULL, /* UART RX via debugger back channel */
+    Board_UART_TX     | PIN_INPUT_EN        | PIN_NOPULL, /* UART TX via debugger back channel */
 
-    Board_RLED   | PIN_GPIO_OUTPUT_EN | PIN_GPIO_LOW | PIN_PUSHPULL | PIN_DRVSTR_MAX,         /* LED initially off             */
-    Board_GLED   | PIN_GPIO_OUTPUT_EN | PIN_GPIO_LOW | PIN_PUSHPULL | PIN_DRVSTR_MAX,         /* LED initially off             */
-    Board_BTN1   | PIN_INPUT_EN | PIN_PULLUP | PIN_IRQ_BOTHEDGES | PIN_HYSTERESIS,            /* Button is active low          */
-    Board_BTN2   | PIN_INPUT_EN | PIN_PULLUP | PIN_IRQ_BOTHEDGES | PIN_HYSTERESIS,            /* Button is active low          */
-    Board_SPI_FLASH_CS | PIN_GPIO_OUTPUT_EN | PIN_GPIO_HIGH | PIN_PUSHPULL | PIN_DRVSTR_MIN,  /* External flash chip select    */
-    Board_UART_RX | PIN_INPUT_EN | PIN_PULLDOWN,                                              /* UART RX via debugger back channel */
-    Board_UART_TX | PIN_GPIO_OUTPUT_EN | PIN_GPIO_HIGH | PIN_PUSHPULL,                        /* UART TX via debugger back channel */
-    Board_SPI0_MOSI | PIN_INPUT_EN | PIN_PULLDOWN,                                            /* SPI master out - slave in */
-    Board_SPI0_MISO | PIN_INPUT_EN | PIN_PULLDOWN,                                            /* SPI master in - slave out */
-    Board_SPI0_CLK | PIN_INPUT_EN | PIN_PULLDOWN,                                             /* SPI clock */
-
+    Board_SX_MISO     | PIN_INPUT_DIS       | PIN_NOPULL,
+    Board_SX_MOSI     | PIN_INPUT_DIS       | PIN_NOPULL,
+    Board_SX_SCK      | PIN_INPUT_DIS       | PIN_NOPULL,
+    Board_SX_RESET    | PIN_GPIO_OUTPUT_DIS | PIN_GPIO_LOW,
+    Board_SX_NSS      | PIN_GPIO_OUTPUT_DIS | PIN_GPIO_LOW,
+    Board_SX_DIO0     | PIN_INPUT_EN        | PIN_NOPULL,
+    Board_SX_DIO1     | PIN_INPUT_EN        | PIN_NOPULL,
+    Board_SX_DIO2     | PIN_INPUT_EN        | PIN_NOPULL,
+    Board_SX_DIO3     | PIN_INPUT_EN        | PIN_NOPULL,
+    Board_SX_DIO4     | PIN_INPUT_EN        | PIN_NOPULL,
+    Board_SX_DIO5     | PIN_INPUT_EN        | PIN_NOPULL,
+    Board_SX_RF_CTRL1 | PIN_GPIO_OUTPUT_EN  | PIN_GPIO_LOW,
+    Board_SX_RF_CTRL2 | PIN_GPIO_OUTPUT_EN  | PIN_GPIO_LOW,
     PIN_TERMINATE
 };
 
@@ -127,11 +134,11 @@ const PowerCC26XX_Config PowerCC26XX_config = {
 #include <ti/drivers/uart/UARTCC26XX.h>
 
 /* UART objects */
-UARTCC26XX_Object uartCC26XXObjects[CC2650_LAUNCHXL_UARTCOUNT];
-unsigned char uartCC26XXRingBuffer[CC2650_LAUNCHXL_UARTCOUNT][32];
+UARTCC26XX_Object uartCC26XXObjects[LORABUG_UARTCOUNT];
+unsigned char uartCC26XXRingBuffer[LORABUG_UARTCOUNT][32];
 
 /* UART hardware parameter structure, also used to assign UART pins */
-const UARTCC26XX_HWAttrsV2 uartCC26XXHWAttrs[CC2650_LAUNCHXL_UARTCOUNT] = {
+const UARTCC26XX_HWAttrsV2 uartCC26XXHWAttrs[LORABUG_UARTCOUNT] = {
     {
         .baseAddr       = UART0_BASE,
         .powerMngrId    = PowerCC26XX_PERIPH_UART0,
@@ -173,10 +180,10 @@ const UART_Config UART_config[] = {
 #include <ti/drivers/dma/UDMACC26XX.h>
 
 /* UDMA objects */
-UDMACC26XX_Object udmaObjects[CC2650_LAUNCHXL_UDMACOUNT];
+UDMACC26XX_Object udmaObjects[LORABUG_UDMACOUNT];
 
 /* UDMA configuration structure */
-const UDMACC26XX_HWAttrs udmaHWAttrs[CC2650_LAUNCHXL_UDMACOUNT] = {
+const UDMACC26XX_HWAttrs udmaHWAttrs[LORABUG_UDMACOUNT] = {
     {
         .baseAddr    = UDMA0_BASE,
         .powerMngrId = PowerCC26XX_PERIPH_UDMA,
@@ -210,10 +217,10 @@ const UDMACC26XX_Config UDMACC26XX_config[] = {
 #include <ti/drivers/spi/SPICC26XXDMA.h>
 
 /* SPI objects */
-SPICC26XXDMA_Object spiCC26XXDMAObjects[CC2650_LAUNCHXL_SPICOUNT];
+SPICC26XXDMA_Object spiCC26XXDMAObjects[LORABUG_SPICOUNT];
 
 /* SPI configuration structure, describing which pins are to be used */
-const SPICC26XXDMA_HWAttrsV1 spiCC26XXDMAHWAttrs[CC2650_LAUNCHXL_SPICOUNT] = {
+const SPICC26XXDMA_HWAttrsV1 spiCC26XXDMAHWAttrs[LORABUG_SPICOUNT] = {
     {
         .baseAddr           = SSI0_BASE,
         .intNum             = INT_SSI0_COMB,
@@ -276,10 +283,10 @@ const SPI_Config SPI_config[] = {
 #include <ti/drivers/i2c/I2CCC26XX.h>
 
 /* I2C objects */
-I2CCC26XX_Object i2cCC26xxObjects[CC2650_LAUNCHXL_I2CCOUNT];
+I2CCC26XX_Object i2cCC26xxObjects[LORABUG_I2CCOUNT];
 
 /* I2C configuration structure, describing which pins are to be used */
-const I2CCC26XX_HWAttrsV1 i2cCC26xxHWAttrs[CC2650_LAUNCHXL_I2CCOUNT] = {
+const I2CCC26XX_HWAttrsV1 i2cCC26xxHWAttrs[LORABUG_I2CCOUNT] = {
     {
         .baseAddr = I2C0_BASE,
         .powerMngrId = PowerCC26XX_PERIPH_I2C0,
@@ -319,10 +326,10 @@ const I2C_Config I2C_config[] = {
 #include <ti/drivers/crypto/CryptoCC26XX.h>
 
 /* Crypto objects */
-CryptoCC26XX_Object cryptoCC26XXObjects[CC2650_LAUNCHXL_CRYPTOCOUNT];
+CryptoCC26XX_Object cryptoCC26XXObjects[LORABUG_CRYPTOCOUNT];
 
 /* Crypto configuration structure, describing which pins are to be used */
-const CryptoCC26XX_HWAttrs cryptoCC26XXHWAttrs[CC2650_LAUNCHXL_CRYPTOCOUNT] = {
+const CryptoCC26XX_HWAttrs cryptoCC26XXHWAttrs[LORABUG_CRYPTOCOUNT] = {
     {
         .baseAddr       = CRYPTO_BASE,
         .powerMngrId    = PowerCC26XX_PERIPH_CRYPTO,
@@ -368,78 +375,6 @@ const RFCC26XX_HWAttrs RFCC26XX_hwAttrs = {
  */
 
 /*
- *  ========================= Display begin ====================================
- */
-/* Place into subsections to allow the TI linker to remove items properly */
-#if defined(__TI_COMPILER_VERSION__)
-#pragma DATA_SECTION(Display_config, ".const:Display_config")
-#pragma DATA_SECTION(displaySharpHWattrs, ".const:displaySharpHWattrs")
-#pragma DATA_SECTION(displayUartHWAttrs, ".const:displayUartHWAttrs")
-#endif
-
-#include <ti/mw/display/Display.h>
-#include <ti/mw/display/DisplaySharp.h>
-#include <ti/mw/display/DisplayUart.h>
-
-/* Structures for UartPlain Blocking */
-DisplayUart_Object        displayUartObject;
-
-#ifndef BOARD_DISPLAY_UART_STRBUF_SIZE
-#define BOARD_DISPLAY_UART_STRBUF_SIZE    128
-#endif
-static char uartStringBuf[BOARD_DISPLAY_UART_STRBUF_SIZE];
-
-const DisplayUart_HWAttrs displayUartHWAttrs = {
-    .uartIdx      = Board_UART,
-    .baudRate     =     115200,
-    .mutexTimeout = BIOS_WAIT_FOREVER,
-    .strBuf = uartStringBuf,
-    .strBufLen = BOARD_DISPLAY_UART_STRBUF_SIZE,
-};
-
-/* Structures for SHARP */
-DisplaySharp_Object displaySharpObject;
-
-#ifndef BOARD_DISPLAY_SHARP_SIZE
-#define BOARD_DISPLAY_SHARP_SIZE    96 // 96->96x96 is the most common board, alternative is 128->128x128.
-#endif
-static uint8_t sharpDisplayBuf[BOARD_DISPLAY_SHARP_SIZE * BOARD_DISPLAY_SHARP_SIZE / 8];
-
-const DisplaySharp_HWAttrs displaySharpHWattrs = {
-    .spiIndex    = Board_SPI0,
-    .csPin       = Board_LCD_CS,
-    .extcominPin = Board_LCD_EXTCOMIN,
-    .powerPin    = Board_LCD_POWER,
-    .enablePin   = Board_LCD_ENABLE,
-    .pixelWidth  = BOARD_DISPLAY_SHARP_SIZE,
-    .pixelHeight = BOARD_DISPLAY_SHARP_SIZE,
-    .displayBuf  = sharpDisplayBuf,
-};
-
-/* Array of displays */
-const Display_Config Display_config[] = {
-#if !defined(BOARD_DISPLAY_EXCLUDE_UART)
-    {
-        .fxnTablePtr = &DisplayUart_fxnTable,
-        .object      = &displayUartObject,
-        .hwAttrs     = &displayUartHWAttrs,
-    },
-#endif
-#if !defined(BOARD_DISPLAY_EXCLUDE_LCD)
-    {
-        .fxnTablePtr = &DisplaySharp_fxnTable,
-        .object      = &displaySharpObject,
-        .hwAttrs     = &displaySharpHWattrs
-    },
-#endif
-    { NULL, NULL, NULL } // Terminator
-};
-
-/*
- *  ========================= Display end ======================================
- */
-
-/*
  *  ============================ GPTimer begin =================================
  *  Remove unused entries to reduce flash usage both in Board.c and Board.h
  */
@@ -450,7 +385,7 @@ const Display_Config Display_config[] = {
 #endif
 
 /* GPTimer hardware attributes, one per timer part (Timer 0A, 0B, 1A, 1B..) */
-const GPTimerCC26XX_HWAttrs gptimerCC26xxHWAttrs[CC2650_LAUNCHXL_GPTIMERPARTSCOUNT] = {
+const GPTimerCC26XX_HWAttrs gptimerCC26xxHWAttrs[LORABUG_GPTIMERPARTSCOUNT] = {
     { .baseAddr = GPT0_BASE, .intNum = INT_GPT0A, .intPriority = (~0), .powerMngrId = PowerCC26XX_PERIPH_GPT0, .pinMux = GPT_PIN_0A, },
     { .baseAddr = GPT0_BASE, .intNum = INT_GPT0B, .intPriority = (~0), .powerMngrId = PowerCC26XX_PERIPH_GPT0, .pinMux = GPT_PIN_0B, },
     { .baseAddr = GPT1_BASE, .intNum = INT_GPT1A, .intPriority = (~0), .powerMngrId = PowerCC26XX_PERIPH_GPT1, .pinMux = GPT_PIN_1A, },
@@ -462,10 +397,10 @@ const GPTimerCC26XX_HWAttrs gptimerCC26xxHWAttrs[CC2650_LAUNCHXL_GPTIMERPARTSCOU
 };
 
 /*  GPTimer objects, one per full-width timer (A+B) (Timer 0, Timer 1..) */
-GPTimerCC26XX_Object gptimerCC26XXObjects[CC2650_LAUNCHXL_GPTIMERCOUNT];
+GPTimerCC26XX_Object gptimerCC26XXObjects[LORABUG_GPTIMERCOUNT];
 
 /* GPTimer configuration (used as GPTimer_Handle by driver and application) */
-const GPTimerCC26XX_Config GPTimerCC26XX_config[CC2650_LAUNCHXL_GPTIMERPARTSCOUNT] = {
+const GPTimerCC26XX_Config GPTimerCC26XX_config[LORABUG_GPTIMERPARTSCOUNT] = {
     { &gptimerCC26XXObjects[0], &gptimerCC26xxHWAttrs[0], GPT_A },
     { &gptimerCC26XXObjects[0], &gptimerCC26xxHWAttrs[1], GPT_B },
     { &gptimerCC26XXObjects[1], &gptimerCC26xxHWAttrs[2], GPT_A },
@@ -493,7 +428,7 @@ const GPTimerCC26XX_Config GPTimerCC26XX_config[CC2650_LAUNCHXL_GPTIMERPARTSCOUN
 #endif
 
 /* PWM configuration, one per PWM output.   */
-PWMTimerCC26XX_HwAttrs pwmtimerCC26xxHWAttrs[CC2650_LAUNCHXL_PWMCOUNT] = {
+PWMTimerCC26XX_HwAttrs pwmtimerCC26xxHWAttrs[LORABUG_PWMCOUNT] = {
     { .pwmPin = Board_PWMPIN0, .gpTimerUnit = Board_GPTIMER0A },
     { .pwmPin = Board_PWMPIN1, .gpTimerUnit = Board_GPTIMER0B },
     { .pwmPin = Board_PWMPIN2, .gpTimerUnit = Board_GPTIMER1A },
@@ -505,12 +440,12 @@ PWMTimerCC26XX_HwAttrs pwmtimerCC26xxHWAttrs[CC2650_LAUNCHXL_PWMCOUNT] = {
 };
 
 /* PWM object, one per PWM output */
-PWMTimerCC26XX_Object pwmtimerCC26xxObjects[CC2650_LAUNCHXL_PWMCOUNT];
+PWMTimerCC26XX_Object pwmtimerCC26xxObjects[LORABUG_PWMCOUNT];
 
 extern const PWM_FxnTable PWMTimerCC26XX_fxnTable;
 
 /* PWM configuration (used as PWM_Handle by driver and application) */
-const PWM_Config PWM_config[CC2650_LAUNCHXL_PWMCOUNT + 1] = {
+const PWM_Config PWM_config[LORABUG_PWMCOUNT + 1] = {
     { &PWMTimerCC26XX_fxnTable, &pwmtimerCC26xxObjects[0], &pwmtimerCC26xxHWAttrs[0] },
     { &PWMTimerCC26XX_fxnTable, &pwmtimerCC26xxObjects[1], &pwmtimerCC26xxHWAttrs[1] },
     { &PWMTimerCC26XX_fxnTable, &pwmtimerCC26xxObjects[2], &pwmtimerCC26xxHWAttrs[2] },
@@ -542,7 +477,7 @@ const PWM_Config PWM_config[CC2650_LAUNCHXL_PWMCOUNT + 1] = {
 #include <ti/drivers/adcbuf/ADCBufCC26XX.h>
 
 /* ADCBuf objects */
-ADCBufCC26XX_Object adcBufCC26xxObjects[CC2650_LAUNCHXL_ADCBufCOUNT];
+ADCBufCC26XX_Object adcBufCC26xxObjects[LORABUG_ADCBufCOUNT];
 
 /*
  *  This table converts a virtual adc channel into a dio and internal analogue input signal.
@@ -565,7 +500,7 @@ const ADCBufCC26XX_AdcChannelLutEntry ADCBufCC26XX_adcChannelLut[] = {
     {Board_DIO30_ANALOG, ADC_COMPB_IN_AUXIO0},
 };
 
-const ADCBufCC26XX_HWAttrs adcBufCC26xxHWAttrs[CC2650_LAUNCHXL_ADCBufCOUNT] = {
+const ADCBufCC26XX_HWAttrs adcBufCC26xxHWAttrs[LORABUG_ADCBufCOUNT] = {
     {
         .intPriority = ~0,
         .swiPriority = 0,
@@ -599,10 +534,10 @@ const ADCBuf_Config ADCBuf_config[] = {
 #include <ti/drivers/adc/ADCCC26XX.h>
 
 /* ADC objects */
-ADCCC26XX_Object adcCC26xxObjects[CC2650_LAUNCHXL_ADCCOUNT];
+ADCCC26XX_Object adcCC26xxObjects[LORABUG_ADCCOUNT];
 
 
-const ADCCC26XX_HWAttrs adcCC26xxHWAttrs[CC2650_LAUNCHXL_ADCCOUNT] = {
+const ADCCC26XX_HWAttrs adcCC26xxHWAttrs[LORABUG_ADCCOUNT] = {
     {
         .adcDIO = Board_DIO23_ANALOG,
         .adcCompBInput = ADC_COMPB_IN_AUXIO7,
@@ -724,9 +659,9 @@ const ADC_Config ADC_config[] = {
 #include <ti/drivers/Watchdog.h>
 #include <ti/drivers/watchdog/WatchdogCC26XX.h>
 
-WatchdogCC26XX_Object watchdogCC26XXObjects[CC2650_LAUNCHXL_WATCHDOGCOUNT];
+WatchdogCC26XX_Object watchdogCC26XXObjects[LORABUG_WATCHDOGCOUNT];
 
-const WatchdogCC26XX_HWAttrs watchdogCC26XXHWAttrs[CC2650_LAUNCHXL_WATCHDOGCOUNT] = {
+const WatchdogCC26XX_HWAttrs watchdogCC26XXHWAttrs[LORABUG_WATCHDOGCOUNT] = {
     {
         .baseAddr = WDT_BASE,
         .intNum = INT_WDT_IRQ,
@@ -744,9 +679,9 @@ const Watchdog_Config Watchdog_config[] = {
 };
 
 /*
- *  ======== CC26XX_LAUNCHXL_initWatchdog ========
+ *  ======== LORABUG_initWatchdog ========
  */
-void CC26XX_LAUNCHXL_initWatchdog(void)
+void LORABUG_initWatchdog(void)
 {
     Watchdog_init();
 }

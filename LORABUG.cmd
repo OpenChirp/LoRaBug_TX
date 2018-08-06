@@ -30,7 +30,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 /*
- *  ======== CC2650_LAUNCHXL.cmd ========
+ *  ======== LORABUG.cmd ========
  *  CC26x0F128 PG2 linker configuration file for Code Composer Studio
  */
 

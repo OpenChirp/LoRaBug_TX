@@ -66,8 +66,8 @@ static PIN_State ledPinState;
  *   - All LEDs board LEDs are off.
  */
 PIN_Config ledPinTable[] = {
-    Board_LED0 | PIN_GPIO_OUTPUT_EN | PIN_GPIO_LOW | PIN_PUSHPULL | PIN_DRVSTR_MAX,
-    Board_LED1 | PIN_GPIO_OUTPUT_EN | PIN_GPIO_LOW | PIN_PUSHPULL | PIN_DRVSTR_MAX,
+    Board_RLED | PIN_GPIO_OUTPUT_EN | PIN_GPIO_LOW  | PIN_PUSHPULL,
+    Board_GLED | PIN_GPIO_OUTPUT_EN | PIN_GPIO_HIGH | PIN_PUSHPULL,
     PIN_TERMINATE
 };
 
@@ -80,8 +80,10 @@ Void heartBeatFxn(UArg arg0, UArg arg1)
 {
     while (1) {
         Task_sleep((UInt)arg0);
-        PIN_setOutputValue(ledPinHandle, Board_LED0,
-                           !PIN_getOutputValue(Board_LED0));
+        PIN_setOutputValue(ledPinHandle, Board_RLED,
+                           !PIN_getOutputValue(Board_RLED));
+        PIN_setOutputValue(ledPinHandle, Board_GLED,
+                           !PIN_getOutputValue(Board_GLED));
     }
 }
 

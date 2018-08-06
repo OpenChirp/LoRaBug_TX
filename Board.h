@@ -39,24 +39,24 @@ extern "C" {
 
 #include <ti/drivers/Power.h>
 
-#include "CC2650_LAUNCHXL.h"
+#include "LORABUG.h"
 
 /* These #defines allow us to reuse TI-RTOS across other device families */
 #define     Board_LED0              Board_RLED
 #define     Board_LED1              Board_GLED
 #define     Board_LED2              Board_LED0
 
-#define     Board_BUTTON0           Board_BTN1
-#define     Board_BUTTON1           Board_BTN2
+#define     Board_BUTTON0           Board_BTN
+#define     Board_BUTTON1           PIN_UNASSIGNED
 
 #define     Board_UART0             Board_UART
 #define     Board_AES0              Board_AES
-#define     Board_WATCHDOG0         CC2650_LAUNCHXL_WATCHDOG0
+#define     Board_WATCHDOG0         LORABUG_WATCHDOG0
 
-#define     Board_ADC0              CC2650_LAUNCHXL_ADCVSS
-#define     Board_ADC1              CC2650_LAUNCHXL_ADCVDDS
+#define     Board_ADC0              LORABUG_ADCVSS
+#define     Board_ADC1              LORABUG_ADCVDDS
 
-#define     Board_ADCBuf0           CC2650_LAUNCHXL_ADCBuf0
+#define     Board_ADCBuf0           LORABUG_ADCBuf0
 #define     Board_ADCBufChannel0    (0)
 #define     Board_ADCBufChannel1    (1)
 
