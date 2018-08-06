@@ -1,3 +1,10 @@
+# Requirements
+Unfortunately, the LoRaMAC-node implementation of LoRaWAN uses C99's in for loop
+variable declaration. For this reason, you MUST change the C compiler Language
+mode to allow C99 syntax.
+Currently, the C99 syntax usage is isolated to the
+[LoRaMac.c](loramac/src/mac/LoRaMac.c) file.
+
 ## Example Summary
 
 This example is intended to be a starting point for new development where

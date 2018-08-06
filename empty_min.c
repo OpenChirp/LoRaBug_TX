@@ -52,6 +52,10 @@
 /* Board Header files */
 #include "Board.h"
 
+/* LoRa Radio Header files */
+#include "board.h" // The LoRaMac-node/src/boads/LoRaBug/board.h file
+#include "radio.h"
+
 #define TASKSTACKSIZE   512
 
 Task_Struct task0Struct;
@@ -78,12 +82,21 @@ PIN_Config ledPinTable[] = {
  */
 Void heartBeatFxn(UArg arg0, UArg arg1)
 {
+    Radio.Sleep();
+
     while (1) {
+        // Red
+        PIN_setOutputValue(ledPinHandle, Board_RLED, Board_LED_ON);
+        PIN_setOutputValue(ledPinHandle, Board_GLED, Board_LED_OFF);
         Task_sleep((UInt)arg0);
-        PIN_setOutputValue(ledPinHandle, Board_RLED,
-                           !PIN_getOutputValue(Board_RLED));
-        PIN_setOutputValue(ledPinHandle, Board_GLED,
-                           !PIN_getOutputValue(Board_GLED));
+        // Green
+        PIN_setOutputValue(ledPinHandle, Board_RLED, Board_LED_OFF);
+        PIN_setOutputValue(ledPinHandle, Board_GLED, Board_LED_ON);
+        Task_sleep((UInt)arg0);
+        // Sleep Hard
+        PIN_setOutputValue(ledPinHandle, Board_RLED, Board_LED_OFF);
+        PIN_setOutputValue(ledPinHandle, Board_GLED, Board_LED_OFF);
+        Task_sleep((UInt)arg0 * 3);
     }
 }
 
@@ -97,9 +110,11 @@ int main(void)
     /* Call board init functions */
     Board_initGeneral();
     // Board_initI2C();
-    // Board_initSPI();
+    Board_initSPI();
     // Board_initUART();
     // Board_initWatchdog();
+
+    BoardInitMcu(); // Initialize LoRa Stack
 
     /* Construct heartBeat Task  thread */
     Task_Params_init(&taskParams);

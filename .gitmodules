@@ -1,0 +1,3 @@
+[submodule "LoRaMac-node"]
+	path = loramac
+	url = https://github.com/OpenChirp/LoRaMac-node.git
