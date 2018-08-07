@@ -1,20 +1,24 @@
 # Example Summary
-
-This example is intended to be a starting point for new development where
+This example cycles through illuminating the red LED, the green LED,
+and then sleeping at a rate determined by the `arg0` parameter for the
+constructed heart beat Task.
+It is intended to be a starting point for new development where
 a minimal footprint is needed.
+
+See [blinky_sleep.c](blinky_sleep.c) for more information.
+
+# Special Cloning
+
+```
+git clone https://github.com/OpenChirp/LoRaBug_BlinkySleep.git
+git submodule update --init --recursive
+```
 
 # Peripherals Exercised
 
 * `Board_RLED`
 * `Board_GLED`
 * `Radio.Sleep()`
-
-# Example Usage
-
-This example cycles through illuminating the red LED, the green LED,
-and then sleeping at a rate determined by the `arg0` parameter for the
-constructed heart beat Task.
-See [blinky_sleep.c](blinky_sleep.c) for more information.
 
 # Application Design Details
 
