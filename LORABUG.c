@@ -57,7 +57,7 @@
 #include <driverlib/ioc.h>
 #include <driverlib/udma.h>
 
-#include <Board.h>
+#include <LORABUG.h>
 
 /*
  *  ========================= IO driver initialization =========================

@@ -323,6 +323,48 @@ typedef enum LORABUG_WatchdogName {
     LORABUG_WATCHDOGCOUNT
 } LORABUG_WatchdogName;
 
+
+/** ============================================================================
+ *  From Board.h file
+ *  ==========================================================================*/
+
+/* These #defines allow us to reuse TI-RTOS across other device families */
+#define     Board_LED0              Board_RLED
+#define     Board_LED1              Board_GLED
+#define     Board_LED2              Board_LED0
+
+#define     Board_BUTTON0           Board_BTN
+#define     Board_BUTTON1           PIN_UNASSIGNED
+
+#define     Board_UART0             Board_UART
+#define     Board_AES0              Board_AES
+#define     Board_WATCHDOG0         LORABUG_WATCHDOG0
+
+#define     Board_ADC0              LORABUG_ADCVSS
+#define     Board_ADC1              LORABUG_ADCVDDS
+
+#define     Board_ADCBuf0           LORABUG_ADCBuf0
+#define     Board_ADCBufChannel0    (0)
+#define     Board_ADCBufChannel1    (1)
+
+#define     Board_initGeneral() { \
+    Power_init(); \
+    if (PIN_init(BoardGpioInitTable) != PIN_SUCCESS) \
+        {System_abort("Error with PIN_init\n"); \
+    } \
+}
+
+#define     Board_initGPIO()
+#define     Board_initPWM()        PWM_init()
+#define     Board_initSPI()         SPI_init()
+#define     Board_initUART()        UART_init()
+#define     Board_initWatchdog()    Watchdog_init()
+#define     Board_initADCBuf()      ADCBuf_init()
+#define     Board_initADC()         ADC_init()
+#define     GPIO_toggle(n)
+#define     GPIO_write(n,m)
+
+
 #ifdef __cplusplus
 }
 #endif

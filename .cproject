@@ -108,7 +108,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="loramac/src/system/fifo.c|loramac/src/system/uart.c|loramac/src/system/timer.c|loramac/src/system/i2c.c|loramac/src/system/gps.c|loramac/src/system/gpio.c|loramac/src/system/eeprom.c|loramac/src/system/delay.c|loramac/src/system/adc.c|loramac/src/mac|loramac/src/radio/sx1272|loramac/Doc|loramac/Keil|loramac/coIDE|loramac/src/peripherals|loramac/src/apps|loramac/src/boards/SK-iM880A|loramac/src/boards/SensorNode|loramac/src/boards/NAMote72|loramac/src/boards/MoteII|loramac/src/boards/mcu|loramac/src/boards/LoRaMote|src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="loramac/src/system/fifo.c|loramac/src/system/uart.c|loramac/src/system/timer.c|loramac/src/system/i2c.c|loramac/src/system/gps.c|loramac/src/system/gpio.c|loramac/src/system/eeprom.c|loramac/src/system/delay.c|loramac/src/system/adc.c|loramac/src/radio/sx1272|loramac/Doc|loramac/Keil|loramac/coIDE|loramac/src/peripherals|loramac/src/apps|loramac/src/boards/SK-iM880A|loramac/src/boards/SensorNode|loramac/src/boards/NAMote72|loramac/src/boards/MoteII|loramac/src/boards/mcu|loramac/src/boards/LoRaMote|src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

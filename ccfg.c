@@ -47,7 +47,7 @@
  *        remain unmodified.
  */
 
-#include "Board.h"
+#include <LORABUG.h>
 
 //#####################################
 // Bootloader settings
