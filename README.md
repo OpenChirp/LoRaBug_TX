@@ -7,7 +7,7 @@ a minimal footprint is needed.
 
 See [blinky_sleep.c](blinky_sleep.c) for more information.
 
-# Special Cloning
+# Cloning and Submodules
 
 ```
 git clone https://github.com/OpenChirp/LoRaBug_BlinkySleep.git
@@ -22,6 +22,7 @@ git submodule update --init --recursive
 
 # Application Design Details
 
+## Minimal footprint
 This example is based on the CC2650 Launchpad empty_min example project.
 
 The empty_min is the same as the Empty example except many development
@@ -40,6 +41,10 @@ var ROM = xdc.useModule('ti.sysbios.rom.ROM');
 ```
 > Since the kernel in the ROM is being used, there is no logging or assert
 checking done by the kernel.
+
+## Bootloader
+The button is configured in trigger the bootloader if depressed during reset.
+This is configured in the [ccfg.c](ccfg.c) file.
 
 # References
 
