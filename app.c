@@ -20,6 +20,9 @@
 // #include <ti/drivers/UART.h>
 // #include <ti/drivers/Watchdog.h>
 
+/* Low level drivers */
+#include <driverlib/sys_ctrl.h> // SysCtrlSystemReset()
+
 /* Board Header files */
 #include "LORABUG.h"
 
@@ -32,20 +35,32 @@
 Task_Struct task0Struct;
 Char task0Stack[TASKSTACKSIZE];
 
-/* Pin driver handle */
+/* Pin driver handles */
 static PIN_Handle ledPinHandle;
 static PIN_State ledPinState;
+static PIN_Handle btnPinHandle;
+static PIN_State btnPinState;
 
 /*
  * Application LED pin configuration table:
  *   - All LEDs board LEDs are off.
  */
-PIN_Config ledPinTable[] = {
-    Board_RLED | PIN_GPIO_OUTPUT_EN | PIN_GPIO_LOW  | PIN_PUSHPULL,
-    Board_GLED | PIN_GPIO_OUTPUT_EN | PIN_GPIO_HIGH | PIN_PUSHPULL,
+static const PIN_Config ledPinTable[] = {
+    Board_RLED | PIN_GPIO_OUTPUT_EN | PIN_GPIO_LOW | PIN_PUSHPULL,
+    Board_GLED | PIN_GPIO_OUTPUT_EN | PIN_GPIO_LOW | PIN_PUSHPULL,
+    PIN_TERMINATE
+};
+static const PIN_Config btnPinTable[] = {
+    Board_BTN | PIN_INPUT_EN | PIN_NOPULL | PIN_IRQ_NEGEDGE,
     PIN_TERMINATE
 };
 
+/* Button callback handler */
+void btnCallback(PIN_Handle handle, PIN_Id pinId) {
+    // This will hard reset the board.
+    // This should trigger the bootloader, since the button is still depressed.
+    SysCtrlSystemReset();
+}
 /*
  *  ======== heartBeatFxn ========
  *  Toggle the Board_LED0. The Task_sleep is determined by arg0 which
@@ -100,6 +115,12 @@ int main(void)
     if(!ledPinHandle) {
         System_abort("Error initializing board LED pins\n");
     }
+    /* Open Button pin */
+    btnPinHandle = PIN_open(&btnPinState, btnPinTable);
+    if(!btnPinHandle) {
+        System_abort("Error initializing board Button pin\n");
+    }
+    PIN_registerIntCb(btnPinHandle, btnCallback);
 
     /* Start BIOS */
     BIOS_start();
