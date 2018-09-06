@@ -19,7 +19,7 @@ git submodule update --init --recursive
 
 * LEDs
 * Radio for TX Only
-* Button callback
+* Button callback (with bootloader launching)
 
 # Application Design Details
 
