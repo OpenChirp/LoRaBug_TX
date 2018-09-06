@@ -1,26 +1,41 @@
 # Example Summary
-This example cycles through illuminating the red LED, the green LED,
-and then sleeping at a rate determined by the `arg0` parameter for the
-constructed heart beat Task.
-It is intended to be a starting point for new development where
-a minimal footprint is needed.
+This example cycles through sending a LoRa packet, indicating the send status
+using the onboard LEDs, and then sleeping.
 
-See [blinky_sleep.c](blinky_sleep.c) for more information.
+This example also configures the button to reset and trigger
+the bootloader for immediate programming using a serial bootloader utility,
+like [ccbootutil](https://github.com/openchirp/ccbootutil).
+
+See [app.c](app.c) for more information.
 
 # Cloning and Submodules
 
 ```
-git clone https://github.com/OpenChirp/LoRaBug_BlinkySleep.git
+git clone https://github.com/OpenChirp/LoRaBug_TX.git
 git submodule update --init --recursive
 ```
 
-# Peripherals Exercised
+# Features Exercised
 
-* `Board_RLED`
-* `Board_GLED`
-* `Radio.Sleep()`
+* LEDs
+* Radio for TX Only
+* Button callback
 
 # Application Design Details
+
+## Bootloader
+We have configured the button to make the MCU jump into the bootloader
+when pressed. This allows for quick programming using a bootloader utility.
+To make this happen, we utilize two key features.
+1. The ability to have the MCU hard reset itself when the button is pressed
+   (uses `SysCtrlSystemReset()`).
+2. The ability to use the button as the backdoor to trigger the bootloader
+   on boot (configured in [ccfg.c](ccfg.c)).
+
+When the button is pressed, the button callback forces a hard reset.
+Since you finger is still depressing the button when it starts to boot,
+the bootloader backdoor is triggered, which launches the ROM bootloader.
+The green LED always glows when the bootloader is launched.
 
 ## Minimal footprint
 This example is based on the CC2650 Launchpad empty_min example project.
@@ -41,10 +56,6 @@ var ROM = xdc.useModule('ti.sysbios.rom.ROM');
 ```
 > Since the kernel in the ROM is being used, there is no logging or assert
 checking done by the kernel.
-
-## Bootloader
-The button is configured in trigger the bootloader if depressed during reset.
-This is configured in the [ccfg.c](ccfg.c) file.
 
 # References
 
