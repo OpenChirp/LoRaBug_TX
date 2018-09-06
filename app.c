@@ -83,8 +83,8 @@ static const RadioEvents_t RadioEventHandlers = {
 
 
 /* Radio Settings */
-#define RF_FREQUENCY                                915e6    // Hz (915MHz band is 902e3 to 928e3)
-#define TX_OUTPUT_POWER                             20       // dBm
+#define RF_FREQUENCY                                915e6     // Hz (915MHz band is 902e3 to 928e3)
+#define TX_OUTPUT_POWER                             20        // dBm
 
 #define LORA_BANDWIDTH                              0         // [0: 125 kHz,
                                                               //  1: 250 kHz,
