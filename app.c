@@ -147,11 +147,11 @@ Void mainTask(UArg arg0, UArg arg1)
         Radio.Sleep();
 
         // Wait for lights to be seen
-        Task_sleep((UInt)arg0 / 4);
+        Task_sleep((UInt)arg0);
         // Sleep Hard
         PIN_setOutputValue(ledPinHandle, Board_RLED, Board_LED_OFF);
         PIN_setOutputValue(ledPinHandle, Board_GLED, Board_LED_OFF);
-        Task_sleep((UInt)arg0 / 4);
+        Task_sleep((UInt)arg0);
     }
 }
 
