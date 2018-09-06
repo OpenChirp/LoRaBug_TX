@@ -191,6 +191,7 @@ int main(void)
     }
     PIN_registerIntCb(btnPinHandle, btnCallback);
 
+    /* Setup events for Radio calls */
     Event_construct(&eventsStruct, NULL);
     events = Event_handle(&eventsStruct);
 
