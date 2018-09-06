@@ -1,4 +1,4 @@
-/**@file blinky_sleep.c
+/**@file app.c
  *
  * @brief Blink both LEDs, sleep, and repeat.
  * @author Craig Hesling <craig@hesling.com>
