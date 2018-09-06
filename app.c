@@ -1,7 +1,7 @@
 /**@file app.c
  *
- * @brief Blink both LEDs, sleep, and repeat.
- * @author Craig Hesling <craig@hesling.com>
+ * @brief Send packet, indicate send status using LEDs, sleep, and repeat.
+ * @author Craig Hesling
  */
 
 /* XDCtools Header files */
@@ -12,6 +12,7 @@
 #include <ti/sysbios/BIOS.h>
 #include <ti/sysbios/knl/Task.h>
 #include <ti/sysbios/knl/Clock.h>
+#include <ti/sysbios/knl/Event.h>
 
 /* TI-RTOS Header files */
 // #include <ti/drivers/I2C.h>
@@ -34,6 +35,12 @@
 
 Task_Struct task0Struct;
 Char task0Stack[TASKSTACKSIZE];
+
+/* Event handle and constants */
+#define EVENT_TXDONE Event_Id_00
+#define EVENT_TXTIMEOUT Event_Id_01
+static Event_Struct eventsStruct;
+static Event_Handle events;
 
 /* Pin driver handles */
 static PIN_Handle ledPinHandle;
@@ -61,28 +68,90 @@ void btnCallback(PIN_Handle handle, PIN_Id pinId) {
     // This should trigger the bootloader, since the button is still depressed.
     SysCtrlSystemReset();
 }
-/*
- *  ======== heartBeatFxn ========
- *  Toggle the Board_LED0. The Task_sleep is determined by arg0 which
- *  is configured for the heartBeat Task instance.
- */
-Void heartBeatFxn(UArg arg0, UArg arg1)
+
+/* Radio callback handlers */
+static void TxDone() {
+    Event_post(events, EVENT_TXDONE);
+}
+static void TxTimeout() {
+    Event_post(events, EVENT_TXTIMEOUT);
+}
+static const RadioEvents_t RadioEventHandlers = {
+   .TxDone    = TxDone,
+   .TxTimeout = TxTimeout,
+};
+
+
+/* Radio Settings */
+#define RF_FREQUENCY                                915e6    // Hz (915MHz band is 902e3 to 928e3)
+#define TX_OUTPUT_POWER                             20       // dBm
+
+#define LORA_BANDWIDTH                              0         // [0: 125 kHz,
+                                                              //  1: 250 kHz,
+                                                              //  2: 500 kHz,
+                                                              //  3: Reserved]
+#define LORA_SPREADING_FACTOR                       7         // [SF7..SF12]
+#define LORA_CODINGRATE                             1         // [1: 4/5,
+                                                              //  2: 4/6,
+                                                              //  3: 4/7,
+                                                              //  4: 4/8]
+#define LORA_PREAMBLE_LENGTH                        8         // Same for Tx and Rx (uint16_t)
+#define LORA_SYMBOL_TIMEOUT                         5         // Symbols - Up to 1023 symbols (for RX)
+#define LORA_FIX_LENGTH_PAYLOAD_ON                  false
+#define LORA_IQ_INVERSION_ON                        false
+#define CRC_ON                                      true
+#define TRANSMISSION_TIMEOUT                        3e3       // ms
+
+
+
+Void mainTask(UArg arg0, UArg arg1)
 {
-    Radio.Sleep();
+    const uint8_t  msg[] = "Hello air space!";
+
+    Radio.Init((RadioEvents_t *)&RadioEventHandlers);
+    Radio.SetChannel(RF_FREQUENCY); // Must set channel before SetTxConfig
+    Radio.SetTxConfig(MODEM_LORA,
+                      TX_OUTPUT_POWER,
+                      0, // Frequency Deviation (FSK only)
+                      LORA_BANDWIDTH,
+                      LORA_SPREADING_FACTOR,
+                      LORA_CODINGRATE,
+                      LORA_PREAMBLE_LENGTH,
+                      LORA_FIX_LENGTH_PAYLOAD_ON,
+                      CRC_ON,
+                      false, // FreqHopOn
+                      0,     // HopPeriod
+                      LORA_IQ_INVERSION_ON,
+                      TRANSMISSION_TIMEOUT);
 
     while (1) {
-        // Red
-        PIN_setOutputValue(ledPinHandle, Board_RLED, Board_LED_ON);
-        PIN_setOutputValue(ledPinHandle, Board_GLED, Board_LED_OFF);
-        Task_sleep((UInt)arg0);
-        // Green
-        PIN_setOutputValue(ledPinHandle, Board_RLED, Board_LED_OFF);
-        PIN_setOutputValue(ledPinHandle, Board_GLED, Board_LED_ON);
-        Task_sleep((UInt)arg0);
+        Radio.Send((uint8_t *)msg, sizeof(msg)-1);
+        UInt e = Event_pend(events, Event_Id_NONE, EVENT_TXDONE|EVENT_TXTIMEOUT, BIOS_WAIT_FOREVER);
+        switch (e) {
+        case EVENT_TXDONE:
+            // Green
+            PIN_setOutputValue(ledPinHandle, Board_RLED, Board_LED_OFF);
+            PIN_setOutputValue(ledPinHandle, Board_GLED, Board_LED_ON);
+            break;
+        case EVENT_TXTIMEOUT:
+            // Red
+            PIN_setOutputValue(ledPinHandle, Board_RLED, Board_LED_ON);
+            PIN_setOutputValue(ledPinHandle, Board_GLED, Board_LED_OFF);
+            break;
+        default:
+            // Green + Red
+            PIN_setOutputValue(ledPinHandle, Board_RLED, Board_LED_ON);
+            PIN_setOutputValue(ledPinHandle, Board_GLED, Board_LED_ON);
+            break;
+        }
+        Radio.Sleep();
+
+        // Wait for lights to be seen
+        Task_sleep((UInt)arg0 / 4);
         // Sleep Hard
         PIN_setOutputValue(ledPinHandle, Board_RLED, Board_LED_OFF);
         PIN_setOutputValue(ledPinHandle, Board_GLED, Board_LED_OFF);
-        Task_sleep((UInt)arg0 * 3);
+        Task_sleep((UInt)arg0 / 4);
     }
 }
 
@@ -108,7 +177,7 @@ int main(void)
     taskParams.arg0 = 1000000 / Clock_tickPeriod;
     taskParams.stackSize = TASKSTACKSIZE;
     taskParams.stack = &task0Stack;
-    Task_construct(&task0Struct, (Task_FuncPtr)heartBeatFxn, &taskParams, NULL);
+    Task_construct(&task0Struct, (Task_FuncPtr)mainTask, &taskParams, NULL);
 
     /* Open LED pins */
     ledPinHandle = PIN_open(&ledPinState, ledPinTable);
@@ -121,6 +190,9 @@ int main(void)
         System_abort("Error initializing board Button pin\n");
     }
     PIN_registerIntCb(btnPinHandle, btnCallback);
+
+    Event_construct(&eventsStruct, NULL);
+    events = Event_handle(&eventsStruct);
 
     /* Start BIOS */
     BIOS_start();
