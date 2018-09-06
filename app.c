@@ -172,7 +172,7 @@ int main(void)
 
     BoardInitMcu(); // Initialize LoRa Stack - Must call initSPI before
 
-    /* Construct heartBeat Task  thread */
+    /* Construct main tTask thread */
     Task_Params_init(&taskParams);
     taskParams.arg0 = 1000000 / Clock_tickPeriod;
     taskParams.stackSize = TASKSTACKSIZE;
